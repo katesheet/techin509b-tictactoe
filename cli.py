@@ -2,10 +2,12 @@
 # the Tic-Tac-Toe game. This is where input and output happens.
 # For core game logic, see logic.py.
 
-from logic import make_empty_board, play_game
+from logic import Game
 
 # Reminder to check all the tests
 
 if __name__ == '__main__':
-    board = make_empty_board()
-    play_game(board)
+    player_num = input('please input player number: ')
+    player_num = int(player_num)
+    game = Game(player_num)
+    game.play_game()
