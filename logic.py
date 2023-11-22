@@ -7,8 +7,18 @@ import random
 
 class Player(ABC):
     def __init__(self,symbol) -> None:
-        super().__init__()
+        # super().__init__()
         self.symbol = symbol
+    
+    def all_avaliable_position(self, board):
+        available_positions = []
+        for i in range(len(board)):
+            for j in range(len(board[0])):
+                if board[i][j] is None:
+                    available_positions.append([i, j])
+        self.available_positions = available_positions
+        return available_positions
+
     
     @abstractmethod
     def get_move(self, board):
@@ -19,6 +29,7 @@ class HumanPlayer(Player):
         super().__init__(symbol)
     
     def get_move(self, board):
+        valid_positions = self.all_avaliable_position(board)
         while True:
             try:
                 move_a = input(f"You are {self.symbol}! Enter your move in the format of (x,y): ")
@@ -30,7 +41,7 @@ class HumanPlayer(Player):
             if x > 2 or x < 0 or y > 2 or y < 0:
                 print('invalid move! out of board')
                 continue
-            if board[x][y] is not None:
+            if [x, y] not in valid_positions:
                 print('invalid move! position taken')
                 continue
             else:
@@ -48,6 +59,7 @@ class BotPlayer(Player):
                 if board[i][j] is None:
                     available_positions.append([i, j])
         # print(available_positions)
+        self.available_positions = available_positions
 
         random_option = random.choice(available_positions)
         print(f"Bot (as {self.symbol}) select: {random_option[0]+1},{random_option[1]+1}")
@@ -112,27 +124,31 @@ class Game:
         # return player
         return self.playerO if player == self.playerX else self.playerX
 
+    def game_end(self):
+        if self.get_winner() is not None:
+            return True
+        none_cnt = 0
+        for i in range(3):
+            for j in range(3):
+                if self.board[i][j] is None:
+                    none_cnt += 1
+                    return False
+        return True
 
     def play_game(self):
         winner = None
-        # players = ["X","O"]
         player = self.playerX
-        move_cnt = 0
-        while winner == None and move_cnt < 9:
-            # Show the board to the user.
+        while not self.game_end():
             self.print_board()
-            # Input a move from the player.
             x,y = player.get_move(self.board) # type: ignore
             self.board[x][y] = player.symbol # type: ignore
-            move_cnt = move_cnt + 1
-            # Update who's turn it is.
             player = self.other_player(player)
-            winner = self.get_winner()
+        winner = self.get_winner()
         self.print_board()
         if winner is not None:
             print(f'{winner} won')
         else:
-            print("draw")
+            print("It's a draw!")
 
 
 
