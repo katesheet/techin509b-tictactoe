@@ -4,6 +4,14 @@
 
 from abc import ABC, abstractmethod
 import random
+import logging
+
+logging.basicConfig(filename="logs/log.txt",
+					format='%(asctime)s %(message)s',
+					filemode='a',
+          force=True)
+logger=logging.getLogger()
+logger.setLevel(logging.INFO)
 
 class Player(ABC):
     def __init__(self,symbol) -> None:
@@ -75,6 +83,9 @@ class Game:
         elif player_amount == 2:
             self.playerX = HumanPlayer('X')
             self.playerO = HumanPlayer('O')
+        elif player_amount == 0:
+            self.playerX = BotPlayer('X')
+            self.playerO = BotPlayer('O')
             
 
     def make_empty_board(self):
@@ -142,13 +153,16 @@ class Game:
             self.print_board()
             x,y = player.get_move(self.board) # type: ignore
             self.board[x][y] = player.symbol # type: ignore
+            logger.info(f"{player.symbol} chooses ({x}, {y})")
             player = self.other_player(player)
         winner = self.get_winner()
         self.print_board()
         if winner is not None:
             print(f'{winner} won')
+            logger.info(f"WINNER: {winner}!")
         else:
             print("It's a draw!")
+            logger.info(f"WINNER: NONE!")
 
 
 
